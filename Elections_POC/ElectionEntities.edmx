@@ -1,0 +1,389 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="ElectionModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ElectionArea">
+          <Key>
+            <PropertyRef Name="ElectionAreaId" />
+          </Key>
+          <Property Name="ElectionAreaId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ElectionAreaNameEn" Type="varchar" MaxLength="50" />
+          <Property Name="ElectionAreaAr" Type="nvarchar" MaxLength="50" />
+          <Property Name="GovernorateId" Type="int" />
+        </EntityType>
+        <EntityType Name="Elector">
+          <Key>
+            <PropertyRef Name="ElectorId" />
+          </Key>
+          <Property Name="ElectorId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdentificationNumber" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="PollingStationsId" Type="int" />
+          <Property Name="IdentificationImg" Type="nvarchar(max)" />
+          <Property Name="IdentificationTypeId" Type="nchar" MaxLength="10" />
+          <Property Name="FingerPrintId" Type="int" />
+          <Property Name="CreateDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="FingerPrints">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserID" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FingerIndex" Type="int" Nullable="false" />
+          <Property Name="Template1" Type="image" Nullable="false" />
+          <Property Name="Template2" Type="image" />
+          <Property Name="Memo" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Governorate">
+          <Key>
+            <PropertyRef Name="GovernorateId" />
+          </Key>
+          <Property Name="GovernorateId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GovernorateNameEn" Type="varchar" MaxLength="50" />
+          <Property Name="GovernorateNameAr" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="PollingStations">
+          <Key>
+            <PropertyRef Name="PollingStationsId" />
+          </Key>
+          <Property Name="PollingStationsId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PollingStationsNameEn" Type="varchar" MaxLength="50" />
+          <Property Name="PollingStationsAr" Type="nvarchar" MaxLength="50" />
+          <Property Name="VotingDate" Type="datetime" />
+          <Property Name="ListNumberInRegister" Type="int" />
+          <Property Name="ElectorIdentificationNumber" Type="nvarchar" MaxLength="500" />
+          <Property Name="ElectorName" Type="nvarchar" MaxLength="500" />
+          <Property Name="ElectorTypeId" Type="int" />
+          <Property Name="IdentificationType" Type="int" />
+          <Property Name="ElectionAreaId" Type="int" />
+          <Property Name="Decrypt_ElectorName" Type="nvarchar" MaxLength="500" />
+          <Property Name="Decrypt_ElectorIdentificationNumber" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Password" Type="nvarchar" MaxLength="50" />
+          <Property Name="RoleId" Type="int" />
+        </EntityType>
+        <EntityType Name="UserPollingStations">
+          <Key>
+            <PropertyRef Name="PollingStationsId" />
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="PollingStationsId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ElectionArea_Governorate">
+          <End Role="Governorate" Type="Self.Governorate" Multiplicity="0..1" />
+          <End Role="ElectionArea" Type="Self.ElectionArea" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Governorate">
+              <PropertyRef Name="GovernorateId" />
+            </Principal>
+            <Dependent Role="ElectionArea">
+              <PropertyRef Name="GovernorateId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PollingStations_ElectionArea">
+          <End Role="ElectionArea" Type="Self.ElectionArea" Multiplicity="0..1" />
+          <End Role="PollingStations" Type="Self.PollingStations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectionArea">
+              <PropertyRef Name="ElectionAreaId" />
+            </Principal>
+            <Dependent Role="PollingStations">
+              <PropertyRef Name="ElectionAreaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserPollingStations_PollingStations">
+          <End Role="PollingStations" Type="Self.PollingStations" Multiplicity="1" />
+          <End Role="UserPollingStations" Type="Self.UserPollingStations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PollingStations">
+              <PropertyRef Name="PollingStationsId" />
+            </Principal>
+            <Dependent Role="UserPollingStations">
+              <PropertyRef Name="PollingStationsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserPollingStations_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="UserPollingStations" Type="Self.UserPollingStations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UserPollingStations">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ElectionModelStoreContainer">
+          <EntitySet Name="ElectionArea" EntityType="Self.ElectionArea" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Elector" EntityType="Self.Elector" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FingerPrints" EntityType="Self.FingerPrints" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Governorate" EntityType="Self.Governorate" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PollingStations" EntityType="Self.PollingStations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserPollingStations" EntityType="Self.UserPollingStations" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ElectionArea_Governorate" Association="Self.FK_ElectionArea_Governorate">
+            <End Role="Governorate" EntitySet="Governorate" />
+            <End Role="ElectionArea" EntitySet="ElectionArea" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PollingStations_ElectionArea" Association="Self.FK_PollingStations_ElectionArea">
+            <End Role="ElectionArea" EntitySet="ElectionArea" />
+            <End Role="PollingStations" EntitySet="PollingStations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserPollingStations_PollingStations" Association="Self.FK_UserPollingStations_PollingStations">
+            <End Role="PollingStations" EntitySet="PollingStations" />
+            <End Role="UserPollingStations" EntitySet="UserPollingStations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserPollingStations_User" Association="Self.FK_UserPollingStations_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="UserPollingStations" EntitySet="UserPollingStations" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ElectionModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ElectionArea">
+          <Key>
+            <PropertyRef Name="ElectionAreaId" />
+          </Key>
+          <Property Name="ElectionAreaId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ElectionAreaNameEn" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ElectionAreaAr" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GovernorateId" Type="Int32" />
+          <NavigationProperty Name="Governorate" Relationship="Self.FK_ElectionArea_Governorate" FromRole="ElectionArea" ToRole="Governorate" />
+          <NavigationProperty Name="PollingStations" Relationship="Self.FK_PollingStations_ElectionArea" FromRole="ElectionArea" ToRole="PollingStations" />
+        </EntityType>
+        <EntityType Name="Elector">
+          <Key>
+            <PropertyRef Name="ElectorId" />
+          </Key>
+          <Property Name="ElectorId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdentificationNumber" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PollingStationsId" Type="Int32" />
+          <Property Name="IdentificationImg" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IdentificationTypeId" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="FingerPrintId" Type="Int32" />
+          <Property Name="CreateDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="FingerPrint">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FingerIndex" Type="Int32" Nullable="false" />
+          <Property Name="Template1" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
+          <Property Name="Template2" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="Memo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Governorate">
+          <Key>
+            <PropertyRef Name="GovernorateId" />
+          </Key>
+          <Property Name="GovernorateId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GovernorateNameEn" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="GovernorateNameAr" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ElectionAreas" Relationship="Self.FK_ElectionArea_Governorate" FromRole="Governorate" ToRole="ElectionArea" />
+        </EntityType>
+        <EntityType Name="PollingStation">
+          <Key>
+            <PropertyRef Name="PollingStationsId" />
+          </Key>
+          <Property Name="PollingStationsId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PollingStationsNameEn" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PollingStationsAr" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="VotingDate" Type="DateTime" Precision="3" />
+          <Property Name="ListNumberInRegister" Type="Int32" />
+          <Property Name="ElectorIdentificationNumber" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="ElectorName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="ElectorTypeId" Type="Int32" />
+          <Property Name="IdentificationType" Type="Int32" />
+          <Property Name="ElectionAreaId" Type="Int32" />
+          <Property Name="Decrypt_ElectorName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Decrypt_ElectorIdentificationNumber" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ElectionArea" Relationship="Self.FK_PollingStations_ElectionArea" FromRole="PollingStations" ToRole="ElectionArea" />
+          <NavigationProperty Name="Users" Relationship="Self.UserPollingStations" FromRole="PollingStations" ToRole="User" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="RoleId" Type="Int32" />
+          <NavigationProperty Name="PollingStations" Relationship="Self.UserPollingStations" FromRole="User" ToRole="PollingStations" />
+        </EntityType>
+        <Association Name="FK_ElectionArea_Governorate">
+          <End Role="Governorate" Type="Self.Governorate" Multiplicity="0..1" />
+          <End Role="ElectionArea" Type="Self.ElectionArea" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Governorate">
+              <PropertyRef Name="GovernorateId" />
+            </Principal>
+            <Dependent Role="ElectionArea">
+              <PropertyRef Name="GovernorateId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PollingStations_ElectionArea">
+          <End Role="ElectionArea" Type="Self.ElectionArea" Multiplicity="0..1" />
+          <End Role="PollingStations" Type="Self.PollingStation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectionArea">
+              <PropertyRef Name="ElectionAreaId" />
+            </Principal>
+            <Dependent Role="PollingStations">
+              <PropertyRef Name="ElectionAreaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="UserPollingStations">
+          <End Role="PollingStations" Type="Self.PollingStation" Multiplicity="*" />
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="ElectionEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ElectionAreas" EntityType="Self.ElectionArea" />
+          <EntitySet Name="Electors" EntityType="Self.Elector" />
+          <EntitySet Name="FingerPrints" EntityType="Self.FingerPrint" />
+          <EntitySet Name="Governorates" EntityType="Self.Governorate" />
+          <EntitySet Name="PollingStations" EntityType="Self.PollingStation" />
+          <EntitySet Name="Users" EntityType="Self.User" />
+          <AssociationSet Name="FK_ElectionArea_Governorate" Association="Self.FK_ElectionArea_Governorate">
+            <End Role="Governorate" EntitySet="Governorates" />
+            <End Role="ElectionArea" EntitySet="ElectionAreas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PollingStations_ElectionArea" Association="Self.FK_PollingStations_ElectionArea">
+            <End Role="ElectionArea" EntitySet="ElectionAreas" />
+            <End Role="PollingStations" EntitySet="PollingStations" />
+          </AssociationSet>
+          <AssociationSet Name="UserPollingStations" Association="Self.UserPollingStations">
+            <End Role="PollingStations" EntitySet="PollingStations" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ElectionModelStoreContainer" CdmEntityContainer="ElectionEntities">
+          <EntitySetMapping Name="ElectionAreas">
+            <EntityTypeMapping TypeName="ElectionModel.ElectionArea">
+              <MappingFragment StoreEntitySet="ElectionArea">
+                <ScalarProperty Name="ElectionAreaId" ColumnName="ElectionAreaId" />
+                <ScalarProperty Name="ElectionAreaNameEn" ColumnName="ElectionAreaNameEn" />
+                <ScalarProperty Name="ElectionAreaAr" ColumnName="ElectionAreaAr" />
+                <ScalarProperty Name="GovernorateId" ColumnName="GovernorateId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Electors">
+            <EntityTypeMapping TypeName="ElectionModel.Elector">
+              <MappingFragment StoreEntitySet="Elector">
+                <ScalarProperty Name="ElectorId" ColumnName="ElectorId" />
+                <ScalarProperty Name="IdentificationNumber" ColumnName="IdentificationNumber" />
+                <ScalarProperty Name="PollingStationsId" ColumnName="PollingStationsId" />
+                <ScalarProperty Name="IdentificationImg" ColumnName="IdentificationImg" />
+                <ScalarProperty Name="IdentificationTypeId" ColumnName="IdentificationTypeId" />
+                <ScalarProperty Name="FingerPrintId" ColumnName="FingerPrintId" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FingerPrints">
+            <EntityTypeMapping TypeName="ElectionModel.FingerPrint">
+              <MappingFragment StoreEntitySet="FingerPrints">
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="FingerIndex" ColumnName="FingerIndex" />
+                <ScalarProperty Name="Template1" ColumnName="Template1" />
+                <ScalarProperty Name="Template2" ColumnName="Template2" />
+                <ScalarProperty Name="Memo" ColumnName="Memo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Governorates">
+            <EntityTypeMapping TypeName="ElectionModel.Governorate">
+              <MappingFragment StoreEntitySet="Governorate">
+                <ScalarProperty Name="GovernorateId" ColumnName="GovernorateId" />
+                <ScalarProperty Name="GovernorateNameEn" ColumnName="GovernorateNameEn" />
+                <ScalarProperty Name="GovernorateNameAr" ColumnName="GovernorateNameAr" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PollingStations">
+            <EntityTypeMapping TypeName="ElectionModel.PollingStation">
+              <MappingFragment StoreEntitySet="PollingStations">
+                <ScalarProperty Name="PollingStationsId" ColumnName="PollingStationsId" />
+                <ScalarProperty Name="PollingStationsNameEn" ColumnName="PollingStationsNameEn" />
+                <ScalarProperty Name="PollingStationsAr" ColumnName="PollingStationsAr" />
+                <ScalarProperty Name="VotingDate" ColumnName="VotingDate" />
+                <ScalarProperty Name="ListNumberInRegister" ColumnName="ListNumberInRegister" />
+                <ScalarProperty Name="ElectorIdentificationNumber" ColumnName="ElectorIdentificationNumber" />
+                <ScalarProperty Name="ElectorName" ColumnName="ElectorName" />
+                <ScalarProperty Name="ElectorTypeId" ColumnName="ElectorTypeId" />
+                <ScalarProperty Name="IdentificationType" ColumnName="IdentificationType" />
+                <ScalarProperty Name="ElectionAreaId" ColumnName="ElectionAreaId" />
+                <ScalarProperty Name="Decrypt_ElectorName" ColumnName="Decrypt_ElectorName" />
+                <ScalarProperty Name="Decrypt_ElectorIdentificationNumber" ColumnName="Decrypt_ElectorIdentificationNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="ElectionModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="UserPollingStations" TypeName="ElectionModel.UserPollingStations" StoreEntitySet="UserPollingStations">
+            <EndProperty Name="PollingStations">
+              <ScalarProperty Name="PollingStationsId" ColumnName="PollingStationsId" />
+            </EndProperty>
+            <EndProperty Name="User">
+              <ScalarProperty Name="UserId" ColumnName="UserId" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
